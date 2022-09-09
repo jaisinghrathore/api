@@ -12,7 +12,12 @@ const login = async (req, res) => {
         }
         const match = await bcrypt.compare(password, userExist.password);
         if (match) {
-            res.json({ message: "User signin successfull." });
+            const token = await userExist.generateAuthToken();
+            res.cookie("session_token", token, {
+                httpOnly: true,
+            })
+                .status(201)
+                .json({ message: token });
         } else {
             return res.status(401).json({ error: "Invalid credentials." });
         }
