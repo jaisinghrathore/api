@@ -42,7 +42,27 @@ const deleteAllUsers = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-    res.clearCookie("session_token").send("cookie removed!");
+    try {
+        const data = await user.findOne({ _id: req.params.id });
+        data.tokens = data.tokens.filter((val) => {
+            return val.token !== req.cookies.session_token;
+        });
+        await data.save();
+        res.clearCookie("session_token").send("Token removed!");
+    } catch (err) {
+        res.send(err);
+    }
 };
 
-export { getAllUsers, getSingleUser, deleteAllUsers, logout };
+const logoutAllDevices = async (req, res) => {
+    try {
+        const data = await user.findOne({ _id: req.params.id });
+        data.tokens = [];
+        await data.save();
+        res.clearCookie("session_token").send("All Token removed!");
+    } catch (err) {
+        res.send(err);
+    }
+};
+
+export { getAllUsers, getSingleUser, deleteAllUsers, logout, logoutAllDevices };

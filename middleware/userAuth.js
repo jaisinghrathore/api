@@ -13,7 +13,7 @@ const userAuth = (req, res, next) => {
             return res.status(401).send({ message: "Token is not valid" });
         } else {
             const existingUser = user
-                .findOne({ _id: decod._id })
+                .findOne({ _id: decod._id, "tokens.token": token })
                 .then((user) => {
                     if (!user) {
                         return res

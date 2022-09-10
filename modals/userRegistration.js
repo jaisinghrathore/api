@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        tokens: [
+            {
+                token: { type: String, required: true },
+            },
+        ],
     },
     { timestamps: true }
 );
@@ -44,20 +49,27 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
-userSchema.methods.generateAuthToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            name: this.name,
-            email: this.email,
-            phoneNumber: this.phoneNumber,
-            isAdmin: this.isAdmin,
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: "30d",
-        }
-    );
+userSchema.methods.generateAuthToken = async function () {
+    try {
+        let token = jwt.sign(
+            {
+                _id: this._id,
+                name: this.name,
+                email: this.email,
+                phoneNumber: this.phoneNumber,
+                isAdmin: this.isAdmin,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "30d",
+            }
+        );
+        this.tokens = this.tokens.concat({ token });
+        await this.save();
+        return token;
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 const user = mongoose.model("User", userSchema);
