@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
                 return validator.isMobilePhone(value, ["en-IN"]);
             },
         },
+        isAdmin: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true }
 );
@@ -47,6 +51,7 @@ userSchema.methods.generateAuthToken = function () {
             name: this.name,
             email: this.email,
             phoneNumber: this.phoneNumber,
+            isAdmin: this.isAdmin,
         },
         process.env.JWT_SECRET,
         {

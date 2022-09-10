@@ -1,15 +1,6 @@
 import user from "../modals/userRegistration.js";
 import existingUser from "./helper/userRegistrationhelperFindOneId.js";
 
-const getAllUsers = async (req, res) => {
-    try {
-        const data = await user.find().select({ password: 0 });
-        res.send(data);
-    } catch (err) {
-        res.send(err);
-    }
-};
-
 const postRegistration = async (req, res) => {
     let { name, email, password, phoneNumber } = req.body;
 
@@ -69,9 +60,4 @@ const updateRegistration = async (req, res) => {
     }
 };
 
-export {
-    getAllUsers,
-    postRegistration,
-    deleteRegistration,
-    updateRegistration,
-};
+export { postRegistration, deleteRegistration, updateRegistration };

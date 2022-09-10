@@ -1,6 +1,7 @@
 import express from "express";
+import { userAuth } from "../middleware/userAuth.js";
+
 import {
-    getAllUsers,
     postRegistration,
     deleteRegistration,
     updateRegistration,
@@ -8,12 +9,10 @@ import {
 
 const routes = express.Router();
 
-routes.get("/alldata", getAllUsers);
-
 routes.post("/register", postRegistration);
 
-routes.delete("/register/:id", deleteRegistration);
+routes.delete("/register/:id", userAuth, deleteRegistration);
 
-routes.put("/register/:id", updateRegistration);
+routes.put("/register/:id", userAuth, updateRegistration);
 
 export default routes;
