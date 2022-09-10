@@ -49,6 +49,10 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
+// userSchema.post("save", function (next) {
+//     console.log("fds");
+// });
+
 userSchema.methods.generateAuthToken = async function () {
     try {
         let token = jwt.sign(

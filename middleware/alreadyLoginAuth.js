@@ -13,12 +13,14 @@ const alreadyLoginUserAuth = (req, res, next) => {
             return next();
         } else {
             const alreadyLogin = user
-                .findOne({ _id: decod._id, "tokens.token": token })
+                .findOne({ email: req.body.email, "tokens.token": token })
                 .then((user) => {
                     if (user) {
                         return res
                             .status(404)
                             .send({ error: "User already login" });
+                    } else {
+                        return next();
                     }
                 })
                 .catch(() => {
