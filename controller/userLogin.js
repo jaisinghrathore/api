@@ -13,14 +13,15 @@ const login = async (req, res) => {
         const match = await bcrypt.compare(password, userExist.password);
         if (match) {
             const token = await userExist.generateAuthToken();
-            res.cookie("session_token", token, { httpOnly: true })
+            return res
+                .cookie("session_token", token, { httpOnly: true })
                 .status(201)
                 .json({ message: "User Successfully Login." });
         } else {
             return res.status(401).json({ error: "Invalid credentials." });
         }
     } catch (err) {
-        res.send(err);
+        return res.send(err);
     }
 };
 
