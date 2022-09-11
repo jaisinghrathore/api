@@ -26,7 +26,7 @@ const adminAuth = (req, res, next) => {
                         next();
                     } else {
                         return res.status(406).send({
-                            error: "You are not loggin with this id.",
+                            error: "Not admin.",
                         });
                     }
                 })

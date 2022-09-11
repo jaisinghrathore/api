@@ -1,10 +1,11 @@
-import e from "express";
 import user from "../modals/userRegistration.js";
 import existingUser from "./helper/userRegistrationhelperFindOneId.js";
 
 const postRegistration = async (req, res) => {
-    let { name, email, password, phoneNumber } = req.body;
-
+    let { name, email, password, phoneNumber, isAdmin } = req.body;
+    if (isAdmin) {
+        return res.status(422).json({ err: "Can't make yourself as admin" });
+    }
     if (!name && !email && !password && !phoneNumber) {
         return res.status(422).json({ err: "please fill every field" });
     }
@@ -65,8 +66,20 @@ const updateRegistration = async (req, res) => {
                 .status(405)
                 .json({ error: "Only admin can set user as admin" });
         }
-        await existingUserUpdate.save();
-        res.status(201).json({ message: "user successfully updated." });
+
+        // If admin change his admin power!
+        if (userId == req.user._id) {
+            const token = await existingUserUpdate.generateAuthToken();
+            return res
+                .cookie("session_token", token, { httpOnly: true })
+                .status(201)
+                .json({ message: "User Successfully Updated." });
+        } else {
+            // updation other user token after changing of isAdmin???
+            existingUserUpdate.tokens = [];
+            await existingUserUpdate.save();
+            res.status(201).json({ message: "user successfully updated." });
+        }
     } catch (err) {
         res.send(err);
     }
