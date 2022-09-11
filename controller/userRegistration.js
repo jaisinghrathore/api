@@ -69,6 +69,13 @@ const updateRegistration = async (req, res) => {
 
         // If admin change his admin power!
         if (userId == req.user._id) {
+            existingUserUpdate.tokens = existingUserUpdate.tokens.filter(
+                (val) => {
+                    if (val.token !== req.cookies.session_token) {
+                        return val;
+                    }
+                }
+            );
             const token = await existingUserUpdate.generateAuthToken();
             return res
                 .cookie("session_token", token, { httpOnly: true })
