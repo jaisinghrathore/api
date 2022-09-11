@@ -1,3 +1,4 @@
+import e from "express";
 import user from "../modals/userRegistration.js";
 import existingUser from "./helper/userRegistrationhelperFindOneId.js";
 
@@ -53,6 +54,17 @@ const updateRegistration = async (req, res) => {
         req.body.phoneNumber &&
             (existingUserUpdate.phoneNumber = req.body.phoneNumber);
 
+        // isAdmin logic
+
+        if (req.user.isAdmin) {
+            existingUserUpdate.isAdmin = req.body.isAdmin
+                ? req.body.isAdmin
+                : false;
+        } else {
+            return res
+                .status(405)
+                .json({ error: "Only admin can set user as admin" });
+        }
         await existingUserUpdate.save();
         res.status(201).json({ message: "user successfully updated." });
     } catch (err) {

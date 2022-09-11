@@ -21,7 +21,7 @@ const userAuth = (req, res, next) => {
                             .send({ error: "User not found." });
                     }
                     req.user = decod;
-                    if (req.user._id === req.params.id) {
+                    if (req.user._id === req.params.id || req.user.isAdmin) {
                         next();
                     } else {
                         return res.status(406).send({
