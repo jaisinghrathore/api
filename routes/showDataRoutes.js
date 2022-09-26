@@ -11,8 +11,8 @@ import { adminAuth } from "../middleware/adminAuth.js";
 
 const routes = express.Router();
 
-routes.get("/user", adminAuth, getAllUsers);
-routes.get("/user/:id", userAuth, getSingleUser);
+routes.get("/users", adminAuth, getAllUsers);
+routes.get("/user/:id", adminAuth, getSingleUser);
 
 routes.post("/user/logout/:id", userAuth, logout);
 routes.post("/user/logoutAll/:id", userAuth, logoutAllDevices);

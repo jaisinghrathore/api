@@ -4,10 +4,11 @@ import user from "../modals/userRegistration.js";
 dotenv.config();
 
 const userAuth = (req, res, next) => {
-    const token = req.cookies.session_token;
-    if (!token) {
+    const { authorization } = req.headers;
+    if (!authorization) {
         return res.send("Token is not Supplied?");
     }
+    const token = authorization.slice(7, authorization.length);
     jwt.verify(token, process.env.JWT_SECRET, (err, decod) => {
         if (err) {
             return res.status(401).send({ message: "Token is not valid" });

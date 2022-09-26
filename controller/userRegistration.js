@@ -2,13 +2,18 @@ import user from "../modals/userRegistration.js";
 import existingUser from "./helper/userRegistrationhelperFindOneId.js";
 
 const postRegistration = async (req, res) => {
-    let { name, email, password, phoneNumber, isAdmin } = req.body;
-    if (isAdmin) {
-        return res.status(422).json({ err: "Can't make yourself as admin" });
-    }
-    if (!name && !email && !password && !phoneNumber) {
+    let { username, email, password, cpassword } = req.body;
+
+    if (!username && !email && !password && !cpassword) {
         return res.status(422).json({ err: "please fill every field" });
     }
+
+    if (password !== cpassword) {
+        return res
+            .status(422)
+            .json({ err: "Password and confirm password must be equal." });
+    }
+
     try {
         const existingUser = await user.findOne({ email: email });
         if (existingUser) {
@@ -16,12 +21,18 @@ const postRegistration = async (req, res) => {
                 error: "User Already Exist",
             });
         }
-        const userInfo = new user({ name, email, password, phoneNumber });
-
+        const userInfo = new user({ username, email, password });
         await userInfo.save();
-        res.status(201).json({ message: "user successfully created." });
-    } catch (err) {
-        res.send(err);
+        const token = await userInfo.generateAuthToken();
+        console.log(userInfo);
+        return res.status(201).json({
+            token,
+            username: userInfo.username,
+            email: userInfo.email,
+            _id: userInfo._id,
+        });
+    } catch (error) {
+        return res.send(error);
     }
 };
 
@@ -49,7 +60,7 @@ const updateRegistration = async (req, res) => {
                 error: "User doesn't Exist.",
             });
         }
-        req.body.name && (existingUserUpdate.name = req.body.name);
+        req.body.username && (existingUserUpdate.username = req.body.username);
         req.body.email && (existingUserUpdate.email = req.body.email);
         req.body.password && (existingUserUpdate.password = req.body.password);
         req.body.phoneNumber &&
@@ -67,7 +78,7 @@ const updateRegistration = async (req, res) => {
                 .json({ error: "Only admin can set user as admin" });
         }
 
-        // If admin change his admin power!
+        // If admin change himself admin power!
         if (userId == req.user._id) {
             existingUserUpdate.tokens = existingUserUpdate.tokens.filter(
                 (val) => {

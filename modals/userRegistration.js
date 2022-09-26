@@ -7,7 +7,7 @@ dotenv.config();
 
 const userSchema = new mongoose.Schema(
     {
-        name: { type: String },
+        username: { type: String },
         email: {
             type: String,
             unique: true,
@@ -19,16 +19,6 @@ const userSchema = new mongoose.Schema(
             },
         },
         password: { type: String },
-        phoneNumber: {
-            type: String,
-            unique: true,
-            validate: (value) => {
-                if (!validator.isMobilePhone(value, ["en-IN"])) {
-                    throw new Error("Not a valid number");
-                }
-                return validator.isMobilePhone(value, ["en-IN"]);
-            },
-        },
         isAdmin: {
             type: Boolean,
             default: false,
@@ -58,9 +48,8 @@ userSchema.methods.generateAuthToken = async function () {
         let token = jwt.sign(
             {
                 _id: this._id,
-                name: this.name,
+                username: this.username,
                 email: this.email,
-                phoneNumber: this.phoneNumber,
                 isAdmin: this.isAdmin,
             },
             process.env.JWT_SECRET,
